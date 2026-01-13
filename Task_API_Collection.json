@@ -1,0 +1,824 @@
+{
+    "info": {
+        "name": "Task Management API",
+        "description": "Complete Postman collection for testing the Task Management API.\n\nThis collection demonstrates:\n- All CRUD operations\n- Request validation\n- Query parameters\n- Error handling\n\nBase URL: http://localhost:8000",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_postman_id": "task-api-collection-001"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        },
+        {
+            "key": "task_id",
+            "value": "task-001",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Health & Info",
+            "description": "Basic API health and information endpoints",
+            "item": [
+                {
+                    "name": "Root - Welcome",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/",
+                            "host": ["{{base_url}}"],
+                            "path": [""]
+                        },
+                        "description": "Get API welcome message and documentation links"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Test: Response status is 200",
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "// Test: Response has expected fields",
+                                    "pm.test('Response has message and version', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.have.property('message');",
+                                    "    pm.expect(json).to.have.property('version');",
+                                    "    pm.expect(json).to.have.property('docs');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/health",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "health"]
+                        },
+                        "description": "Check if the API is running and healthy"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Test: Response status is 200",
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "// Test: Status is healthy",
+                                    "pm.test('API status is healthy', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.status).to.eql('healthy');",
+                                    "});",
+                                    "",
+                                    "// Test: Has timestamp",
+                                    "pm.test('Response includes timestamp', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.have.property('timestamp');",
+                                    "});",
+                                    "",
+                                    "// Test: Response time is acceptable",
+                                    "pm.test('Response time is less than 500ms', function() {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "2. GET Tasks",
+            "description": "Retrieve tasks with various filters",
+            "item": [
+                {
+                    "name": "Get All Tasks",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks"]
+                        },
+                        "description": "Retrieve all tasks without any filters"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Test: Response status is 200",
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "// Test: Response has correct structure",
+                                    "pm.test('Response has success, count, and data', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.success).to.be.true;",
+                                    "    pm.expect(json).to.have.property('count');",
+                                    "    pm.expect(json).to.have.property('data');",
+                                    "    pm.expect(json.data).to.be.an('array');",
+                                    "});",
+                                    "",
+                                    "// Test: Tasks have required fields",
+                                    "pm.test('Tasks have required fields', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.data.length > 0) {",
+                                    "        const task = json.data[0];",
+                                    "        pm.expect(task).to.have.property('id');",
+                                    "        pm.expect(task).to.have.property('title');",
+                                    "        pm.expect(task).to.have.property('status');",
+                                    "        pm.expect(task).to.have.property('priority');",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Tasks - Filter by Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks?status=pending",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks"],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "pending",
+                                    "description": "Filter: pending, in-progress, completed, cancelled"
+                                }
+                            ]
+                        },
+                        "description": "Get tasks filtered by status"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('All tasks have pending status', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    json.data.forEach(task => {",
+                                    "        pm.expect(task.status).to.eql('pending');",
+                                    "    });",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Tasks - Filter by Priority",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks?priority=high",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks"],
+                            "query": [
+                                {
+                                    "key": "priority",
+                                    "value": "high",
+                                    "description": "Filter: low, medium, high, urgent"
+                                }
+                            ]
+                        },
+                        "description": "Get tasks filtered by priority level"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('All tasks have high priority', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    json.data.forEach(task => {",
+                                    "        pm.expect(task.priority).to.eql('high');",
+                                    "    });",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Tasks - Search",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks?search=API",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks"],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "API",
+                                    "description": "Search keyword in title/description"
+                                }
+                            ]
+                        },
+                        "description": "Search tasks by keyword"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Search results contain keyword', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    const keyword = 'api';",
+                                    "    json.data.forEach(task => {",
+                                    "        const inTitle = task.title.toLowerCase().includes(keyword);",
+                                    "        const inDesc = task.description && task.description.toLowerCase().includes(keyword);",
+                                    "        pm.expect(inTitle || inDesc).to.be.true;",
+                                    "    });",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Tasks - Pagination",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks?limit=2&offset=0",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks"],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "2",
+                                    "description": "Max results to return"
+                                },
+                                {
+                                    "key": "offset",
+                                    "value": "0",
+                                    "description": "Number of results to skip"
+                                }
+                            ]
+                        },
+                        "description": "Get paginated results"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Results respect limit', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.data.length).to.be.at.most(2);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Single Task",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks/{{task_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks", "{{task_id}}"]
+                        },
+                        "description": "Get a specific task by ID"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has correct task', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.success).to.be.true;",
+                                    "    pm.expect(json.data.id).to.eql(pm.collectionVariables.get('task_id'));",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Task - Not Found (404)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks/invalid-id-12345",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks", "invalid-id-12345"]
+                        },
+                        "description": "Test 404 response for non-existent task"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 404', function() {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});",
+                                    "",
+                                    "pm.test('Error message is descriptive', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.detail).to.include('not found');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "3. POST - Create Tasks",
+            "description": "Create new tasks with validation",
+            "item": [
+                {
+                    "name": "Create Task - Full Data",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"New Task from Postman\",\n    \"description\": \"This task was created via Postman for testing\",\n    \"status\": \"pending\",\n    \"priority\": \"high\",\n    \"due_date\": \"2025-02-15T18:00:00\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks"]
+                        },
+                        "description": "Create a new task with all fields"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201 Created', function() {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Task was created successfully', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.success).to.be.true;",
+                                    "    pm.expect(json.message).to.include('created');",
+                                    "});",
+                                    "",
+                                    "pm.test('Task has generated ID', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.data.id).to.match(/^task-/);",
+                                    "});",
+                                    "",
+                                    "pm.test('Task has timestamps', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.data).to.have.property('created_at');",
+                                    "    pm.expect(json.data).to.have.property('updated_at');",
+                                    "});",
+                                    "",
+                                    "// Save task ID for later use",
+                                    "const json = pm.response.json();",
+                                    "pm.collectionVariables.set('created_task_id', json.data.id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Create Task - Minimal Data",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Quick Task\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks"]
+                        },
+                        "description": "Create task with only required field (title)"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function() {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Default values are applied', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.data.status).to.eql('pending');",
+                                    "    pm.expect(json.data.priority).to.eql('medium');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Create Task - Validation Error (Empty Title)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"\",\n    \"description\": \"This should fail\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks"]
+                        },
+                        "description": "Test validation - empty title should fail"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 422 (Validation Error)', function() {",
+                                    "    pm.response.to.have.status(422);",
+                                    "});",
+                                    "",
+                                    "pm.test('Error details are provided', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.have.property('detail');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Create Task - Validation Error (Missing Title)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"description\": \"No title provided\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks"]
+                        },
+                        "description": "Test validation - missing required field"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 422', function() {",
+                                    "    pm.response.to.have.status(422);",
+                                    "});",
+                                    "",
+                                    "pm.test('Error mentions missing field', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    const detail = JSON.stringify(json.detail);",
+                                    "    pm.expect(detail.toLowerCase()).to.include('title');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "4. PUT - Update Tasks",
+            "description": "Update existing tasks",
+            "item": [
+                {
+                    "name": "Update Task - Change Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"in-progress\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks/{{task_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks", "{{task_id}}"]
+                        },
+                        "description": "Update only the status field"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status was updated', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.data.status).to.eql('in-progress');",
+                                    "});",
+                                    "",
+                                    "pm.test('Updated timestamp changed', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.data.updated_at).to.not.eql(json.data.created_at);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Update Task - Multiple Fields",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Updated Task Title\",\n    \"priority\": \"urgent\",\n    \"status\": \"completed\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks/{{task_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks", "{{task_id}}"]
+                        },
+                        "description": "Update multiple fields at once"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('All fields were updated', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.data.title).to.eql('Updated Task Title');",
+                                    "    pm.expect(json.data.priority).to.eql('urgent');",
+                                    "    pm.expect(json.data.status).to.eql('completed');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Update Task - Not Found (404)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"completed\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks/non-existent-id",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks", "non-existent-id"]
+                        },
+                        "description": "Test 404 when updating non-existent task"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 404', function() {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "5. DELETE - Remove Tasks",
+            "description": "Delete tasks",
+            "item": [
+                {
+                    "name": "Delete Task",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks/task-003",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks", "task-003"]
+                        },
+                        "description": "Delete an existing task"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Delete confirmation received', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.success).to.be.true;",
+                                    "    pm.expect(json.message).to.include('deleted');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete Task - Not Found (404)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/tasks/fake-task-id",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "tasks", "fake-task-id"]
+                        },
+                        "description": "Test 404 when deleting non-existent task"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 404', function() {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "6. Statistics",
+            "description": "Get task statistics",
+            "item": [
+                {
+                    "name": "Get Statistics",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/stats",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "stats"]
+                        },
+                        "description": "Get task counts by status and priority"
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Statistics structure is correct', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.have.property('total_tasks');",
+                                    "    pm.expect(json).to.have.property('by_status');",
+                                    "    pm.expect(json).to.have.property('by_priority');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
