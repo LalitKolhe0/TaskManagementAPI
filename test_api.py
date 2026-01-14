@@ -6,7 +6,7 @@ Run with: pytest tests/test_api.py -v
 
 import pytest
 from fastapi.testclient import TestClient
-from main import app
+from app.main import app
 
 
 
@@ -55,9 +55,9 @@ class TestHealthEndpoints:
         assert "version" in data
 
 
-# ============================================
+
 # GET TASKS TESTS
-# ============================================
+
 
 class TestGetTasks:
     """Tests for retrieving tasks"""
@@ -120,9 +120,9 @@ class TestGetTasks:
         assert "not found" in data["detail"].lower()
 
 
-# ============================================
+
 # CREATE TASK TESTS
-# ============================================
+
 
 class TestCreateTask:
     """Tests for creating tasks"""
@@ -173,9 +173,9 @@ class TestCreateTask:
         assert response.status_code == 422
 
 
-# ============================================
+
 # UPDATE TASK TESTS
-# ============================================
+
 
 class TestUpdateTask:
     """Tests for updating tasks"""
@@ -213,9 +213,8 @@ class TestUpdateTask:
         assert response.status_code == 404
 
 
-# ============================================
+
 # DELETE TASK TESTS
-# ============================================
 
 class TestDeleteTask:
     """Tests for deleting tasks"""
@@ -243,9 +242,8 @@ class TestDeleteTask:
         assert response.status_code == 404
 
 
-# ============================================
+
 # STATISTICS TESTS
-# ============================================
 
 class TestStatistics:
     """Tests for statistics endpoint"""
@@ -259,3 +257,5 @@ class TestStatistics:
         assert "by_status" in data
         assert "by_priority" in data
         assert isinstance(data["total_tasks"], int)
+
+

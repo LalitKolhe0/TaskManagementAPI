@@ -2,15 +2,11 @@
 
 A production-ready RESTful API built with **FastAPI** for managing tasks. This project demonstrates best practices in API development, testing, and documentation.
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.109.0-green.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-
 ---
 
 ## 🔗 GitHub Profile
 
-**Profile**: [github.com/yourusername](https://github.com/yourusername)
+**Profile**: [github.com/lalitkolhe0](https://github.com/lalitkolhe0)
 
 ### About This Project
 
@@ -35,8 +31,8 @@ This API project showcases:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/task-api-fastapi.git
-cd task-api-fastapi
+git clone https://github.com/lalitkolhe0/TaskManagementAPI.git
+cd TaskManagementAPI
 
 # Create virtual environment
 python -m venv venv
@@ -179,11 +175,11 @@ task-api-fastapi/
 ├── app/
 │   ├── __init__.py
 │   └── main.py          # FastAPI application
-├── tests/
+├── 
 │   └── test_api.py      # Unit tests
-├── postman/
+├── 
 │   └── Task_API_Collection.json
-├── docs/
+├── 
 │   └── API_TESTING_GUIDE.md
 ├── requirements.txt
 ├── README.md
@@ -223,16 +219,7 @@ uvicorn app.main:app --reload
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
 
-## 👤 Author
-
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
-
----
 
 ## 🤝 Contributing
 

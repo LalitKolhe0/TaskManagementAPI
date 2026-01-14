@@ -3,8 +3,8 @@ Task Management API
 ====================
 A RESTful API built with FastAPI for managing tasks.
 
-GitHub Repository: https://github.com/lalitkolhe0/task-api-fastapi
-Author: Your Name
+GitHub Repository: https://github.com/lalitkolhe0/TASKMANAGEMENTAPI
+Author: Lalit Kolhe
 Version: 1.0.0
 
 Features:
@@ -16,14 +16,14 @@ Features:
 
 from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 import uuid
 
-# ENUMS & MODELS
 
+# ENUMS & MODELS
 
 class TaskStatus(str, Enum):
     """Task status options"""
@@ -49,8 +49,8 @@ class TaskCreate(BaseModel):
     priority: TaskPriority = Field(default=TaskPriority.MEDIUM, description="Priority level")
     due_date: Optional[datetime] = Field(None, description="Due date for the task")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "title": "Complete API Documentation",
                 "description": "Write comprehensive docs with examples",
@@ -59,6 +59,7 @@ class TaskCreate(BaseModel):
                 "due_date": "2025-02-01T10:00:00"
             }
         }
+    )
 
 
 class TaskUpdate(BaseModel):
@@ -69,13 +70,14 @@ class TaskUpdate(BaseModel):
     priority: Optional[TaskPriority] = None
     due_date: Optional[datetime] = None
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "status": "completed",
                 "priority": "low"
             }
         }
+    )
 
 
 class Task(BaseModel):
@@ -111,9 +113,9 @@ class ErrorResponse(BaseModel):
     detail: str
 
 
-# ============================================
+
 # APPLICATION SETUP
-# ============================================
+
 
 app = FastAPI(
     title="Task Management API",
@@ -158,9 +160,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ============================================
+
 # IN-MEMORY DATABASE (Demo purposes)
-# ============================================
+
 
 tasks_db: dict[str, Task] = {}
 
@@ -202,9 +204,9 @@ for task_data in sample_tasks:
     tasks_db[task_data["id"]] = Task(**task_data)
 
 
-# ============================================
+
 # API ENDPOINTS
-# ============================================
+
 
 @app.get("/", tags=["Root"])
 async def root():
@@ -452,9 +454,8 @@ async def delete_task(task_id: str):
     }
 
 
-# ============================================
+
 # STATISTICS ENDPOINT
-# ============================================
 
 @app.get("/api/stats", tags=["Statistics"])
 async def get_statistics():
@@ -480,10 +481,11 @@ async def get_statistics():
     }
 
 
-# ============================================
+
 # RUN APPLICATION
-# ============================================
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    # Use string import path for reload to work properly
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
